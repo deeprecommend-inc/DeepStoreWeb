@@ -1,15 +1,12 @@
-import * as React from 'react';
-import dayjs, { Dayjs } from 'dayjs';
-import Badge from '@mui/material/Badge';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { PickersDay, PickersDayProps } from '@mui/x-date-pickers/PickersDay';
-import { DateCalendar } from '@mui/x-date-pickers/DateCalendar';
-import { DayCalendarSkeleton } from '@mui/x-date-pickers/DayCalendarSkeleton';
-import { makeStyles } from '@mui/material';
-
-
-
+import * as React from "react";
+import dayjs, { Dayjs } from "dayjs";
+import Badge from "@mui/material/Badge";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { PickersDay, PickersDayProps } from "@mui/x-date-pickers/PickersDay";
+import { DateCalendar } from "@mui/x-date-pickers/DateCalendar";
+import { DayCalendarSkeleton } from "@mui/x-date-pickers/DayCalendarSkeleton";
+import { makeStyles } from "@mui/material";
 
 function getRandomNumber(min: number, max: number) {
   return Math.round(Math.random() * (max - min) + min);
@@ -23,33 +20,42 @@ function fakeFetch(date: Dayjs, { signal }: { signal: AbortSignal }) {
   return new Promise<{ daysToHighlight: number[] }>((resolve, reject) => {
     const timeout = setTimeout(() => {
       const daysInMonth = date.daysInMonth();
-      const daysToHighlight = [1, 2, 3].map(() => getRandomNumber(1, daysInMonth));
+      const daysToHighlight = [1, 2, 3].map(() =>
+        getRandomNumber(1, daysInMonth)
+      );
 
       resolve({ daysToHighlight });
     }, 500);
 
     signal.onabort = () => {
       clearTimeout(timeout);
-      reject(new DOMException('aborted', 'AbortError'));
+      reject(new DOMException("aborted", "AbortError"));
     };
   });
 }
 
-const initialValue = dayjs('2022-04-17');
+const initialValue = dayjs("2022-04-17");
 
-function ServerDay(props: PickersDayProps<Dayjs> & { highlightedDays?: number[] }) {
+function ServerDay(
+  props: PickersDayProps<Dayjs> & { highlightedDays?: number[] }
+) {
   const { highlightedDays = [], day, outsideCurrentMonth, ...other } = props;
 
   const isSelected =
-    !props.outsideCurrentMonth && highlightedDays.indexOf(props.day.date()) >= 0;
+    !props.outsideCurrentMonth &&
+    highlightedDays.indexOf(props.day.date()) >= 0;
 
   return (
     <Badge
       key={props.day.toString()}
       overlap="circular"
-      badgeContent={isSelected ? '🌚' : undefined}
+      badgeContent={isSelected ? "🌚" : undefined}
     >
-      <PickersDay {...other} outsideCurrentMonth={outsideCurrentMonth} day={day} />
+      <PickersDay
+        {...other}
+        outsideCurrentMonth={outsideCurrentMonth}
+        day={day}
+      />
     </Badge>
   );
 }
@@ -70,7 +76,7 @@ export const Calendar = () => {
       })
       .catch((error) => {
         // ignore the error if it's caused by `controller.abort`
-        if (error.name !== 'AbortError') {
+        if (error.name !== "AbortError") {
           throw error;
         }
       });
@@ -99,11 +105,6 @@ export const Calendar = () => {
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
       <DateCalendar
-        className={{
-            // カレンダーサイズのカスタマイズ
-            width: '100%', // または固定値、例えば '500px'
-            height: 'auto'
-          }}
         defaultValue={initialValue}
         loading={isLoading}
         onMonthChange={handleMonthChange}
@@ -119,4 +120,4 @@ export const Calendar = () => {
       />
     </LocalizationProvider>
   );
-}
+};
