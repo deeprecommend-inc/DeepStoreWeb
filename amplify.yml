@@ -3,12 +3,11 @@ frontend:
   phases:
     preBuild:
       commands:
-        - rm -rf node_modules
-        - rm -rf yarn.lock
-        - yarn install --ignore-engines
+        - yarn install
     build:
       commands:
-        - yarn run build
+        - export NODE_OPTIONS="--max-old-space-size=5120"
+        - yarn build:dev
   artifacts:
     baseDirectory: .next
     files:
