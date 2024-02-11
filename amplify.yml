@@ -5,8 +5,8 @@ frontend:
       commands:
         - rm -rf node_modules
         - rm -rf yarn.lock
-        - yarn install --ignore-engines
         - nvm use 18.17.0
+        - yarn install --ignore-engines
     build:
       commands:
         - yarn run build
