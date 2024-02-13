@@ -1,125 +1,88 @@
-import * as React from "react";
-import dayjs, { Dayjs } from "dayjs";
-import Badge from "@mui/material/Badge";
-import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import { PickersDay, PickersDayProps } from "@mui/x-date-pickers/PickersDay";
-import { DateCalendar } from "@mui/x-date-pickers/DateCalendar";
-import { DayCalendarSkeleton } from "@mui/x-date-pickers/DayCalendarSkeleton";
-import { makeStyles } from "@mui/material";
+"use client";
 
-function getRandomNumber(min: number, max: number) {
-  return Math.round(Math.random() * (max - min) + min);
-}
+import { useState } from "react";
+import { EventInput, EventClickArg, Calendar } from "@fullcalendar/core";
+import FullCalendar from "@fullcalendar/react";
+import dayGridPlugin from "@fullcalendar/daygrid";
+import interactionPlugin, { DateClickArg } from "@fullcalendar/interaction";
+import Divider from "@mui/material/Divider";
 
-/**
- * Mimic fetch with abort controller https://developer.mozilla.org/en-US/docs/Web/API/AbortController/abort
- * ⚠️ No IE11 support
- */
-function fakeFetch(date: Dayjs, { signal }: { signal: AbortSignal }) {
-  return new Promise<{ daysToHighlight: number[] }>((resolve, reject) => {
-    const timeout = setTimeout(() => {
-      const daysInMonth = date.daysInMonth();
-      const daysToHighlight = [1, 2, 3].map(() =>
-        getRandomNumber(1, daysInMonth)
-      );
+let eventGuid: number = 0;
 
-      resolve({ daysToHighlight });
-    }, 500);
+export const ReservationCalendar = () => {
+  const [events, setEvents] = useState<EventInput[]>([]);
 
-    signal.onabort = () => {
-      clearTimeout(timeout);
-      reject(new DOMException("aborted", "AbortError"));
-    };
-  });
-}
+  const addEvent = (id: string, title: string, date: string) => {
+    const newEvents: EventInput[] = [...events];
+    newEvents.push({ id, title, date, color: "red" });
+    setEvents(newEvents);
+  };
 
-const initialValue = dayjs("2022-04-17");
+  const removeEvent = (id: string) => {
+    const newEvents: EventInput[] = events.filter(
+      (e: EventInput) => e.id != id
+    );
+    setEvents(newEvents);
+  };
 
-function ServerDay(
-  props: PickersDayProps<Dayjs> & { highlightedDays?: number[] }
-) {
-  const { highlightedDays = [], day, outsideCurrentMonth, ...other } = props;
+  const handleDateClick = (clickInfo: DateClickArg) => {
+    const title: string | null = prompt(
+      "Please enter a new title for your event"
+    );
 
-  const isSelected =
-    !props.outsideCurrentMonth &&
-    highlightedDays.indexOf(props.day.date()) >= 0;
-
-  return (
-    <Badge
-      key={props.day.toString()}
-      overlap="circular"
-      badgeContent={isSelected ? "🌚" : undefined}
-    >
-      <PickersDay
-        {...other}
-        outsideCurrentMonth={outsideCurrentMonth}
-        day={day}
-      />
-    </Badge>
-  );
-}
-
-export const Calendar = () => {
-  const requestAbortController = React.useRef<AbortController | null>(null);
-  const [isLoading, setIsLoading] = React.useState(false);
-  const [highlightedDays, setHighlightedDays] = React.useState([1, 2, 15]);
-
-  const fetchHighlightedDays = (date: Dayjs) => {
-    const controller = new AbortController();
-    fakeFetch(date, {
-      signal: controller.signal,
-    })
-      .then(({ daysToHighlight }) => {
-        setHighlightedDays(daysToHighlight);
-        setIsLoading(false);
-      })
-      .catch((error) => {
-        // ignore the error if it's caused by `controller.abort`
-        if (error.name !== "AbortError") {
-          throw error;
-        }
+    const eventId: string = createEventId();
+    const calendarApi = clickInfo.view.calendar;
+    calendarApi.unselect();
+    if (title) {
+      calendarApi.addEvent({
+        id: eventId,
+        title,
+        start: clickInfo.dateStr,
+        end: clickInfo.dateStr,
+        allDay: clickInfo.allDay,
       });
-
-    requestAbortController.current = controller;
+      addEvent(eventId, title, clickInfo.dateStr);
+    }
   };
 
-  React.useEffect(() => {
-    fetchHighlightedDays(initialValue);
-    // abort request on unmount
-    return () => requestAbortController.current?.abort();
-  }, []);
+  const handleEventClick = (clickInfo: EventClickArg) => {
+    clickInfo.event.remove();
+    removeEvent(clickInfo.event.id);
+  };
 
-  const handleMonthChange = (date: Dayjs) => {
-    if (requestAbortController.current) {
-      // make sure that you are aborting useless requests
-      // because it is possible to switch between months pretty quickly
-      requestAbortController.current.abort();
-    }
-
-    setIsLoading(true);
-    setHighlightedDays([]);
-    fetchHighlightedDays(date);
+  const createEventId = (): string => {
+    return `event${++eventGuid}`;
   };
 
   return (
-    <LocalizationProvider dateAdapter={AdapterDayjs}>
-      <div style={{ width: "100%", height: "100%" }}>
-        <DateCalendar
-          defaultValue={initialValue}
-          loading={isLoading}
-          onMonthChange={handleMonthChange}
-          renderLoading={() => <DayCalendarSkeleton />}
-          slots={{
-            day: ServerDay,
-          }}
-          slotProps={{
-            day: {
-              highlightedDays,
-            } as any,
-          }}
-        />
-      </div>
-    </LocalizationProvider>
+    <>
+      <FullCalendar
+        plugins={[dayGridPlugin, interactionPlugin]}
+        initialView="dayGridMonth"
+        events={events}
+        selectable={true}
+        dayMaxEvents={true}
+        businessHours={{ daysOfWeek: [1, 2, 3, 4, 5] }}
+        dateClick={(e: DateClickArg) => {
+          if (e.dayEl.classList.contains("fc-day-past")) return;
+          handleDateClick(e);
+        }}
+        eventClick={(e: EventClickArg) => handleEventClick(e)}
+      />
+      <Divider sx={{ marginTop: 2, marginBottom: 2 }} />
+      <ul>
+        <li>登録中のイベント(削除)</li>
+        <ul>
+          {events.map((e: EventInput) => (
+            <li key={e.id}>
+              {e.title}
+              <span onClick={() => removeEvent(e.id!)}>(x)</span>
+            </li>
+          ))}
+        </ul>
+      </ul>
+    </>
   );
 };
+
+export default ReservationCalendar;
