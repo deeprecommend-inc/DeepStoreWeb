@@ -1,5 +1,6 @@
 import React from "react";
+import Image from "next/image";
 
 export const Qr = () => {
-  return <img src="/qr.png" alt="QR Code" />;
+  return <Image src="/qr.png" width={500} height={500} alt="QR Code" />;
 };
