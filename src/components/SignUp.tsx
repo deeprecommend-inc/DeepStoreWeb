@@ -13,18 +13,60 @@ import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { Copyright } from "./Copyright";
+import { useState } from "react";
 
 // TODO remove, this demo shouldn't need to reset the theme.
 const defaultTheme = createTheme();
 
 export const SignUp = () => {
+  const [canSubmit, setCanSubmit] = useState(true);
+  const [msg, setMsg] = useState("");
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
+    const blankRegex = /^(?=\s*$)/;
+    const emailRegex = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
     const data = new FormData(event.currentTarget);
-    console.log({
-      email: data.get("email"),
-      password: data.get("password"),
-    });
+    const name = data.get("name") as string;
+    const email = data.get("email") as string;
+    const password = data.get("password") as string;
+    event.preventDefault();
+    if (blankRegex.test(name)) {
+      // name is blank
+      // TODO: display an error message
+    } if (!emailRegex.test(email)) {
+      // email is invaild
+      // TODO: display an error messaage
+    } else if (password.length < 8) {
+      // password is too short
+      // TODO: display an error messaage
+    } else {
+      const url = `${process.env.API_ROOT}/auth/register`
+      setCanSubmit(false);
+      setMsg("送信しています..")
+      const abort = new AbortController();
+      const onError = (msg: string = "送信中にエラーが発生しました") => {
+        setMsg(msg);
+        setCanSubmit(true);
+      }
+      fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({name, email, password}),
+        signal: abort.signal
+      }).then(e => {
+        switch (e.status) {
+        case 200:
+          setMsg(`${email}に認証リンクを送信しました`);
+          return;
+        case 500: // bad request
+          setMsg(`すでに${email}で登録されています`);
+          return;
+        default:
+           onError();
+           return;
+        }
+      }).catch(onError);
+      return () => {abort.abort();setMsg("");setCanSubmit(true)}
+    }
   };
 
   return (
@@ -52,54 +94,34 @@ export const SignUp = () => {
             sx={{ mt: 3 }}
           >
             <Grid container spacing={2}>
-              <Grid item xs={12} sm={6}>
+              <Grid item xs={12}>
                 <TextField
-                  autoComplete="given-name"
-                  name="firstName"
+                  autoComplete="name"
+                  name="name"
+                  label="名前"
                   required
                   fullWidth
-                  id="firstName"
-                  label="First Name"
                   autoFocus
                 />
               </Grid>
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  required
-                  fullWidth
-                  id="lastName"
-                  label="Last Name"
-                  name="lastName"
-                  autoComplete="family-name"
-                />
-              </Grid>
               <Grid item xs={12}>
                 <TextField
-                  required
-                  fullWidth
-                  id="email"
-                  label="Email Address"
-                  name="email"
                   autoComplete="email"
+                  name="email"
+                  label="Email Address"
+                  type="email"
+                  required
+                  fullWidth
                 />
               </Grid>
               <Grid item xs={12}>
                 <TextField
-                  required
-                  fullWidth
+                  autoComplete="new-password"
                   name="password"
                   label="Password"
                   type="password"
-                  id="password"
-                  autoComplete="new-password"
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <FormControlLabel
-                  control={
-                    <Checkbox value="allowExtraEmails" color="primary" />
-                  }
-                  label="I want to receive inspiration, marketing promotions and updates via email."
+                  required
+                  fullWidth
                 />
               </Grid>
             </Grid>
@@ -108,12 +130,13 @@ export const SignUp = () => {
               fullWidth
               variant="contained"
               sx={{ mt: 3, mb: 2 }}
+              disabled={!canSubmit}
             >
               Sign Up
             </Button>
             <Grid container justifyContent="flex-end">
               <Grid item>
-                <Link href="#" variant="body2">
+                <Link href="/login" variant="body2">
                   Already have an account? Sign in
                 </Link>
               </Grid>
@@ -122,6 +145,7 @@ export const SignUp = () => {
         </Box>
         <Copyright sx={{ mt: 5 }} />
       </Container>
+      <p>{msg}</p>
     </ThemeProvider>
   );
 };

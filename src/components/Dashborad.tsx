@@ -1,4 +1,3 @@
-import * as React from "react";
 import { styled, createTheme, ThemeProvider } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
 import MuiDrawer from "@mui/material/Drawer";
@@ -22,6 +21,9 @@ import { useRouter } from "next/navigation";
 import { color } from "../constants/const";
 import { ReservationCalendar } from "./Calendar";
 import { Qr } from "./Qr";
+import { useEffect, useState } from "react";
+import { SettingsSuggestRounded } from "@mui/icons-material";
+import useToken from "@/hooks/useToken";
 
 function Copyright(props: any) {
   return (
@@ -94,12 +96,33 @@ const Drawer = styled(MuiDrawer, {
 // TODO remove, this demo shouldn't need to reset the theme.
 const defaultTheme = createTheme();
 
+interface User {
+  name: string;
+  pid: string;
+  email: string;
+}
+
 export const Dashboard = () => {
-  const [open, setOpen] = React.useState(true);
+  const [open, setOpen] = useState(true);
   const router = useRouter();
+  const [user, setUser] = useState<User | null>(null);
+  const [token, setToken] = useToken();
   const toggleDrawer = () => {
     setOpen(!open);
   };
+  useEffect(() => {
+    const url = `${process.env.API_ROOT}/user/current`
+    fetch(url, {
+      method: "GET",
+      headers: {
+        "Authorization": `Bearer ${token}`
+      }}).then(res => {
+        switch (res.status) {
+          case 200:
+            res.json().then(data => setUser(data))
+        }
+      })
+  }, [token]);
 
   return (
     <ThemeProvider theme={defaultTheme}>
@@ -151,6 +174,8 @@ export const Dashboard = () => {
                   <NotificationsIcon />
                 </Badge>
               </IconButton>
+              { user == null ? 
+              <>
               <Button
                 variant="text"
                 sx={{ color: "white" }}
@@ -168,7 +193,18 @@ export const Dashboard = () => {
                 }}
               >
                 ログイン
+              </Button></>
+              : <>
+              <Button variant="text" sx={{color:"white"}}>
+                {user.name}
               </Button>
+              <Button
+                variant="text"
+                sx={{ color: "white" }}
+                onClick={() => setToken("")}>
+                  ログアウト
+                </Button>
+              </>}
             </div>
           </Toolbar>
         </AppBar>
