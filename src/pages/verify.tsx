@@ -1,40 +1,49 @@
+import * as React from "react";
+import Avatar from "@mui/material/Avatar";
+import CssBaseline from "@mui/material/CssBaseline";
+import Grid from "@mui/material/Grid";
+import Box from "@mui/material/Box";
+import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
+import Typography from "@mui/material/Typography";
+import Container from "@mui/material/Container";
+import { Alert, AlertColor, Button, ThemeProvider } from "@mui/material";
+import { GetServerSideProps, InferGetServerSidePropsType } from "next";
 import Link from "next/link";
-import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
+import { defaultTheme } from "@/lib/defaultTheme";
 
-enum Status {
-    verifying,
-    failed,
-    success
+export default function VerifyPage({ success }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+	return (
+		<ThemeProvider theme={defaultTheme}>
+			<Container component="main" maxWidth="xs">
+				<CssBaseline />
+				<Box
+					sx={{
+						marginTop: 8,
+						display: "flex",
+						flexDirection: "column",
+						alignItems: "center",
+					}}
+				>
+					{success ? <Alert variant="outlined" severity="success" action={<Link href="/login"><Button color="inherit" size="small">ログインする</Button></Link>}>認証に成功しました。</Alert>
+						: <Alert variant="outlined" severity="error" action={<Link href="/register"><Button color="inherit" size="small">再登録する</Button></Link>}>認証に失敗しました</Alert>}
+				</Box>
+			</Container>
+		</ThemeProvider>
+	);
 }
 
-export default function verifyPage() {
-    const router = useRouter();
-    const token = router.asPath.split("#")[1];
-    const [status, setStatus] = useState(Status.verifying);
-    useEffect(() => {
-        fetch(`${process.env.API_ROOT}/auth/verify`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({token}),
-        }).then(res => {
-            switch (res.status) {
-                case 200:
-                    setStatus(Status.success)
-                    return;
-                default: 
-                    setStatus(Status.failed)
-            }
-        })
-    }, [token])
-    switch (status) {
-        case Status.verifying:
-            return <p>トークンを検証中です</p>
-        case Status.failed:
-            return <p>検証に失敗しました。トークンが無効です</p>
-        case Status.success:
-            return <p>検証に成功しました。<Link href="/login">ログインページ</Link>でログインしてください</p>
-    }
-}
+export const getServerSideProps = (async function(context) {
+	// eslint-disable-next-line react-hooks/rules-of-hooks
+	const token = context.query.token;
+	if (!token) return {props: {success: false}};
+	const url = `${process.env.APP_ROOT}/api/auth/verify`;
+	const verificationResult = await fetch(url, {
+		method: "POST",
+		headers: {
+			"Content-Type": "application/json"
+		},
+		body: JSON.stringify({token})
+	});
+	return {props: {success: verificationResult.status == 200}};
+}) satisfies GetServerSideProps<{success: boolean}>;
