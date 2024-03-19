@@ -16,18 +16,13 @@ import { Copyright } from "@/components/Copyright";
 import { useState } from "react";
 import { useRouter } from "next/router";
 import { Alert, AlertColor } from "@mui/material";
+import { useSearchParams } from "next/navigation";
 
 // TODO remove, this demo shouldn't need to reset the theme.
 const defaultTheme = createTheme();
-enum Status {
-    verifying,
-    failed,
-    success
-}
 
 export default function ResetPage() {
-	const router = useRouter();
-	const token = router.asPath.split("#")[1];
+	const token = useSearchParams()?.get("token") || "";
 	const [canSubmit, setCanSubmit] = useState(true);
 	const [msg, setMsg] = useState("");
 	const [msgType, setMsgType] = useState<AlertColor>("success");
@@ -47,7 +42,6 @@ export default function ResetPage() {
 			case 200:
 				setMsg("パスワードをリセットできました")
 				setMsgType("info");
-				router.push("/");
 				return;
 			default:
 				setMsg("トークンが不正です。もう一度トークンを発行してください")
@@ -71,7 +65,7 @@ export default function ResetPage() {
 					<LockOutlinedIcon />
 				</Avatar>
 				<Typography component="h1" variant="h5">
-					Sign up
+					パスワードのリセット
 				</Typography>
 				<Box
 					component="form"
@@ -84,7 +78,7 @@ export default function ResetPage() {
 							<TextField
 								autoComplete="new-password"
 								name="password"
-								label="Password"
+								label="新しいパスワード"
 								type="password"
 								required
 								fullWidth

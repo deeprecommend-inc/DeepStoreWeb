@@ -42,11 +42,6 @@ export default function ForgotPage() {
 			case 200:
 				setMsg("メールを送信しました");
 				setMsgType("info");
-				res.json().then(data => {
-					const token = data.token;
-					localStorage.setItem("token", token);
-					router.push("/");
-				})
 				return;
 			default:
 				setMsg(`${email}のユーザーが見つかりません`)
