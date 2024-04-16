@@ -9,7 +9,7 @@ async function POST(req: NextApiRequest, res: NextApiResponse) {
 		.then(res => res.userId)
 		.then(userId => 
 			prisma.user.update({
-				data: {password: passwordHash},
+				data: {password: passwordHash, resetToken: {delete: {}}},
 				where: {id: userId}
 			}))
 		.then(e => res.status(200).json({msg: "success!"}))

@@ -17,9 +17,7 @@ import { color } from "../constants/const";
 import { useRouter } from "next/router";
 import { useState } from "react";
 import { Alert, AlertColor } from "@mui/material";
-
-// TODO remove, this demo shouldn't need to reset the theme.
-const defaultTheme = createTheme();
+import { defaultTheme } from "@/lib/defaultTheme";
 
 export default function ForgotPage() {
 	const router = useRouter();

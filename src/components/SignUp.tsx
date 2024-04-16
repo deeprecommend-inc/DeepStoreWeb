@@ -15,9 +15,7 @@ import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { Copyright } from "./Copyright";
 import { useState } from "react";
 import { Alert, AlertColor } from "@mui/material";
-
-// TODO remove, this demo shouldn't need to reset the theme.
-const defaultTheme = createTheme();
+import { defaultTheme } from "@/lib/defaultTheme";
 
 export const SignUp = () => {
 	const [canSubmit, setCanSubmit] = useState(true);
@@ -89,7 +87,7 @@ export const SignUp = () => {
 						<LockOutlinedIcon />
 					</Avatar>
 					<Typography component="h1" variant="h5">
-            Sign up
+						Sign up
 					</Typography>
 					<Box
 						component="form"

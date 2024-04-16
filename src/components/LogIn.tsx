@@ -1,4 +1,3 @@
-import * as React from "react";
 import Avatar from "@mui/material/Avatar";
 import Button from "@mui/material/Button";
 import CssBaseline from "@mui/material/CssBaseline";
@@ -16,23 +15,29 @@ import { Copyright } from "./Copyright";
 import { color } from "../constants/const";
 import { useRouter } from "next/router";
 import { signIn } from "next-auth/react";
-
-// TODO remove, this demo shouldn't need to reset the theme.
-const defaultTheme = createTheme();
+import { useState } from "react";
+import { Alert, AlertColor } from "@mui/material";
+import { defaultTheme } from "@/lib/defaultTheme";
 
 export const LogIn = () => {
 	const router = useRouter();
+	const [canSubmit, setCanSubmit] = useState(true);
+	const [msg, setMsg] = useState("");
+	const [msgType, setMsgType] = useState<AlertColor>("success");
 	const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
 		event.preventDefault();
+		setCanSubmit(false);
 		const data = new FormData(event.currentTarget);
 		const email = data.get("email") as string;
 		const password = data.get("password") as string;
 		signIn("credentials", {email, password, redirect: false }).then(result => {
 			if (result?.ok) {
-				alert("ログインに成功しました")
-				router.push("/");
+				setMsg("ログインに成功しました")
+				setMsgType("info");
 			} else {
-				alert("ログインに失敗しました")
+				setMsg("ログインに失敗しました")
+				setMsgType("error");
+				setCanSubmit(true);
 			}
 		})
 	};
@@ -85,13 +90,17 @@ export const LogIn = () => {
 							control={<Checkbox value="remember" color="primary" />}
 							label="Remember me"
 						/>
+						{msg ?
+							<Alert severity={msgType} variant="outlined">{msg}</Alert>
+							: <></>}
 						<Button
 							type="submit"
 							fullWidth
 							variant="contained"
 							sx={{ mt: 3, mb: 2, backgroundColor: color.blue }}
+							disabled={!canSubmit}
 						>
-              ログインする
+							ログインする
 						</Button>
 						<Grid container>
 							<Grid item xs>

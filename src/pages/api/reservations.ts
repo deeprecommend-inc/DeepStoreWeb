@@ -1,30 +1,32 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import prisma from "@/lib/prisma"
 import { Reservation } from '@prisma/client';
-import { useSession } from 'next-auth/react';
+import { getSession, useSession } from 'next-auth/react';
+import { getServerSession } from 'next-auth';
+import { authOptions } from './auth/[...nextauth]';
  
 async function GET(
 	req: NextApiRequest,
-	res: NextApiResponse<Reservation[]>
+	res: NextApiResponse
 ) {
-	const result = await prisma.reservation.findMany();
+	const result = await prisma.reservation.findMany({select: {date: true, item: true}});
 	res.status(200).json(result);
 }
 
 async function POST(
 	req: NextApiRequest,
-	res: NextApiResponse<Reservation>
+	res: NextApiResponse
 ) {
-	const {date, storeId, item} = req.body;
-	const {data: session} = useSession();
+	const {date, storeId, item} = req.body as {date: string, storeId: string, item: string};
+	const session = await getServerSession(req, res, authOptions);
 	const user = await prisma.user.findUnique({where:{email:session?.user?.email||""}});
 	if (!user) {
-		res.status(500);
+		res.status(500).json({msg: "no user found"});
 		return;
 	}
-	await prisma.reservation.create({data:{date, storeId, userId: user.id, item}})
+	await prisma.reservation.create({data:{date: new Date(date), storeId, userId: user.id, item}})
 		.then(result => res.status(200).json(result))
-		.catch(err => res.status(500));
+		.catch(err => res.status(500).json({msg: err.toString()}));
 }
 
 export default async function handler(

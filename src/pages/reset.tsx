@@ -17,9 +17,7 @@ import { useState } from "react";
 import { useRouter } from "next/router";
 import { Alert, AlertColor } from "@mui/material";
 import { useSearchParams } from "next/navigation";
-
-// TODO remove, this demo shouldn't need to reset the theme.
-const defaultTheme = createTheme();
+import { defaultTheme } from "@/lib/defaultTheme";
 
 export default function ResetPage() {
 	const token = useSearchParams()?.get("token") || "";

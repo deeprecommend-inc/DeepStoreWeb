@@ -20,6 +20,7 @@ import { Qr } from "./Qr";
 import { useState } from "react";
 import { useSession, signIn, signOut } from "next-auth/react"
 import { Copyright } from "./Copyright";
+import { defaultTheme } from "@/lib/defaultTheme";
 
 const drawerWidth: number = 240;
 
@@ -70,9 +71,6 @@ const Drawer = styled(MuiDrawer, {
 		}),
 	},
 }));
-
-// TODO remove, this demo shouldn't need to reset the theme.
-const defaultTheme = createTheme();
 
 export const Dashboard = () => {
 	const [open, setOpen] = useState(true);
