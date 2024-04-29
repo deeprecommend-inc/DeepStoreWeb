@@ -6,7 +6,7 @@ import Box from "@mui/material/Box";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
-import { Alert, , Button, } from "@mui/material";
+import { Alert, Button, } from "@mui/material";
 import { GetServerSideProps, InferGetServerSidePropsType } from "next";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
@@ -32,17 +32,17 @@ export default function VerifyPage({ success }: InferGetServerSidePropsType<type
 	);
 }
 
-export const getServerSideProps = (async function(context) {
+export const getServerSideProps = (async function (context) {
 	// eslint-disable-next-line react-hooks/rules-of-hooks
 	const token = context.query.token;
-	if (!token) return {props: {success: false}};
+	if (!token) return { props: { success: false } };
 	const url = `${process.env.APP_ROOT}/api/auth/verify`;
 	const verificationResult = await fetch(url, {
 		method: "POST",
 		headers: {
 			"Content-Type": "application/json"
 		},
-		body: JSON.stringify({token})
+		body: JSON.stringify({ token })
 	});
-	return {props: {success: verificationResult.status == 200}};
-}) satisfies GetServerSideProps<{success: boolean}>;
+	return { props: { success: verificationResult.status == 200 } };
+}) satisfies GetServerSideProps<{ success: boolean }>;

@@ -20,91 +20,16 @@ import { Qr } from "./Qr";
 import { useState } from "react";
 import { useSession, signIn, signOut } from "next-auth/react"
 import { Copyright } from "./Copyright";
-
-const drawerWidth: number = 240;
-
-interface AppBarProps extends MuiAppBarProps {
-  open?: boolean;
-}
-
-const AppBar = styled(MuiAppBar, {
-	shouldForwardProp: (prop) => prop !== "open",
-})<AppBarProps>(({ theme, open }) => ({
-	zIndex: theme.zIndex.drawer + 1,
-	transition: theme.transitions.create(["width", "margin"], {
-		easing: theme.transitions.easing.sharp,
-		duration: theme.transitions.duration.leavingScreen,
-	}),
-	...(open && {
-		marginLeft: drawerWidth,
-		width: `calc(100% - ${drawerWidth}px)`,
-		transition: theme.transitions.create(["width", "margin"], {
-			easing: theme.transitions.easing.sharp,
-			duration: theme.transitions.duration.enteringScreen,
-		}),
-	}),
-}));
+import NavBar from "./NavBar";
 
 export const Dashboard = () => {
-	const { data: session} = useSession();
+	const { data: session } = useSession();
 
 	return (
-		 <>
+		<>
+			<NavBar isLoggedIn={session != null} username={session?.user?.name || undefined} />
 			<Box sx={{ display: "flex" }}>
 				<CssBaseline />
-				<AppBar position="absolute" sx={{ boxShadow: "none" }}>
-					<Toolbar
-						sx={{
-							pr: "24px", // keep right padding when drawer closed
-							backgroundColor: color.blue,
-						}}
-					>
-						<Typography
-							component="h1"
-							variant="h6"
-							color="inherit"
-							noWrap
-							sx={{ flexGrow: 1 }}
-						>
-              出張買取予約 大吉初芝駅前店
-						</Typography>
-						<div className="grid grid-cols-3 gap-2">
-							{session != null ? (<>
-								<IconButton color="inherit">
-									<Badge badgeContent={4} color="secondary">
-										<NotificationsIcon />
-									</Badge>
-								</IconButton>
-								<Button variant="text">予約する</Button>
-								<Button variant="text" sx={{ color: "white" }}>
-									{session.user?.name}
-								</Button>
-								<Button
-									variant="text"
-									sx={{ color: "white" }}
-									onClick={() => signOut()}>
-                  ログアウト
-								</Button>
-							</>) : (<>
-								<Link href="/signup">
-									<Button
-										variant="text"
-										sx={{ color: "white" }}
-									>
-                    ユーザー登録
-									</Button>
-								</Link>
-								<Button
-									variant="text"
-									sx={{ color: "white" }}
-									onClick={() => signIn()}
-								>
-                  ログイン
-								</Button>
-							</>)}
-						</div>
-					</Toolbar>
-				</AppBar>
 				<Box
 					component="main"
 					sx={{
@@ -123,6 +48,6 @@ export const Dashboard = () => {
 					</Container>
 				</Box>
 			</Box>
-			</>
+		</>
 	);
 };

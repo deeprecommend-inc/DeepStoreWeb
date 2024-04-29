@@ -28,7 +28,7 @@ export const LogIn = () => {
 		const data = new FormData(event.currentTarget);
 		const email = data.get("email") as string;
 		const password = data.get("password") as string;
-		signIn("credentials", {email, password, redirect: false }).then(result => {
+		signIn("credentials", { email, password, redirect: false }).then(result => {
 			if (result?.ok) {
 				setMsg("ログインに成功しました")
 				setMsgType("info");
@@ -41,7 +41,7 @@ export const LogIn = () => {
 	};
 
 	return (
-		 <>
+		<>
 			<Container component="main" maxWidth="xs">
 				<CssBaseline />
 				<Box
@@ -56,7 +56,7 @@ export const LogIn = () => {
 						<LockOutlinedIcon />
 					</Avatar>
 					<Typography component="h1" variant="h5">
-            Sign in
+						Sign in
 					</Typography>
 					<Box
 						component="form"
@@ -103,7 +103,7 @@ export const LogIn = () => {
 						<Grid container>
 							<Grid item xs>
 								<Link href="/forgot" variant="body2">
-                  パスワードを忘れました
+									パスワードを忘れました
 								</Link>
 							</Grid>
 							<Grid item>
@@ -116,6 +116,6 @@ export const LogIn = () => {
 				</Box>
 				<Copyright sx={{ mt: 8, mb: 4 }} />
 			</Container>
-			</>
+		</>
 	);
 };

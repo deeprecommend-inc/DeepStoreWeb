@@ -13,6 +13,7 @@ import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import { Copyright } from "./Copyright";
 import { useState } from "react";
+import { Alert, AlertColor } from "@mui/material";
 
 export const SignUp = () => {
 	const [canSubmit, setCanSubmit] = useState(true);
