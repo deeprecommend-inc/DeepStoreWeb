@@ -13,7 +13,7 @@ export default function App({
 	
 	// localStorageに保存したtokenを読み出す
 	useEffect(() => {
-		_setToken(localStorage.getItem("token"));
+		_setToken(localStorage.getItem("token") || null);
 	}, []);
 
 	// tokenが変更されたらlocalStorageの方も書き換える
@@ -28,5 +28,5 @@ export default function App({
 				<Component {...pageProps} />
 			</TokenContext.Provider>
 		</ThemeProvider>
-	)
+	);
 }

@@ -11,7 +11,7 @@ import { TokenContext } from "@/lib/session";
 
 export const Dashboard = () => {
 	const { token, setToken } = useContext(TokenContext);
-	const [username, setUsername] = useState(token != null ? "ロード中.." : "ログインしていません");
+	const [username, setUsername] = useState("ロード中..");
 	useEffect(() => {
 		if (!token) return;
 		const url = `/api/auth/current`;
