@@ -45,62 +45,20 @@ const AppBar = styled(MuiAppBar, {
 	}),
 }));
 
-const Drawer = styled(MuiDrawer, {
-	shouldForwardProp: (prop) => prop !== "open",
-})(({ theme, open }) => ({
-	"& .MuiDrawer-paper": {
-		position: "relative",
-		whiteSpace: "nowrap",
-		width: drawerWidth,
-		transition: theme.transitions.create("width", {
-			easing: theme.transitions.easing.sharp,
-			duration: theme.transitions.duration.enteringScreen,
-		}),
-		boxSizing: "border-box",
-		...(!open && {
-			overflowX: "hidden",
-			transition: theme.transitions.create("width", {
-				easing: theme.transitions.easing.sharp,
-				duration: theme.transitions.duration.leavingScreen,
-			}),
-			width: theme.spacing(7),
-			[theme.breakpoints.up("sm")]: {
-				width: theme.spacing(9),
-			},
-		}),
-	},
-}));
-
 export const Dashboard = () => {
-	const [open, setOpen] = useState(true);
 	const { data: session} = useSession();
-	const toggleDrawer = () => {
-		setOpen(!open);
-	};
 
 	return (
 		 <>
 			<Box sx={{ display: "flex" }}>
 				<CssBaseline />
-				<AppBar position="absolute" sx={{ boxShadow: "none" }} open={open}>
+				<AppBar position="absolute" sx={{ boxShadow: "none" }}>
 					<Toolbar
 						sx={{
 							pr: "24px", // keep right padding when drawer closed
 							backgroundColor: color.blue,
 						}}
 					>
-						<IconButton
-							edge="start"
-							color="inherit"
-							aria-label="open drawer"
-							onClick={toggleDrawer}
-							sx={{
-								marginRight: "36px",
-								...(open && { display: "none" }),
-							}}
-						>
-							<MenuIcon />
-						</IconButton>
 						<Typography
 							component="h1"
 							variant="h6"
@@ -147,21 +105,6 @@ export const Dashboard = () => {
 						</div>
 					</Toolbar>
 				</AppBar>
-				<Drawer variant="permanent" open={open}>
-					<Toolbar
-						sx={{
-							display: "flex",
-							alignItems: "center",
-							justifyContent: "flex-end",
-							px: [1],
-						}}
-					>
-						<IconButton onClick={toggleDrawer}>
-							<ChevronLeftIcon />
-						</IconButton>
-					</Toolbar>
-					<Divider />
-				</Drawer>
 				<Box
 					component="main"
 					sx={{
