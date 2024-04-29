@@ -1,9 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import prisma from "@/lib/prisma"
 import { Reservation } from '@prisma/client';
-import { getSession, useSession } from 'next-auth/react';
-import { getServerSession } from 'next-auth';
-import { authOptions } from './auth/[...nextauth]';
  
 async function GET(
 	req: NextApiRequest,
@@ -18,8 +15,8 @@ async function POST(
 	res: NextApiResponse
 ) {
 	const {date, storeId, item} = req.body as {date: string, storeId: string, item: string};
-	const session = await getServerSession(req, res, authOptions);
-	const user = await prisma.user.findUnique({where:{email:session?.user?.email||""}});
+	const token = req.headers.authorization?.substring(7);
+	const user = await prisma.$queryRaw`SELECT "User".* FROM "Session" INNER JOIN "Session".userId = "User".id WHERE "Session".id=${token}`;
 	if (!user) {
 		res.status(500).json({msg: "no user found"});
 		return;

@@ -1,24 +1,30 @@
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider    = "postgresql"
+  url         = env("DATABASE_URL")
 }
 
 generator client {
-  provider        = "prisma-client-js"
+  provider    = "prisma-client-js"
 }
 
 model EmailVerification {
-  id String @id @default(cuid())
-  userId String @unique
-  user User @relation(fields:[userId], references: [id])
-  expired_at DateTime 
+  id            String  @id @default(cuid())
+  userId        String  @unique
+  user          User    @relation(fields:[userId], references: [id])
+  expired_at    DateTime 
 }
 
 model PasswordResetToken {
-  id String @id @default(cuid())
-  userId String @unique
-  user User @relation(fields: [userId], references: [id])
-  expired_at DateTime
+  id            String    @id @default(cuid())
+  userId        String    @unique
+  user          User      @relation(fields: [userId], references: [id])
+  expired_at    DateTime
+}
+
+model Session {
+  id            String    @id @default(cuid())
+  userId        String    
+  user          User      @relation(fields: [userId], references: [id ])
 }
 
 model User {
@@ -26,35 +32,36 @@ model User {
   name          String 
   email         String    @unique
   password      String
-  reservations Reservation[]
-  is_verified  Boolean @default(false)
-  verification EmailVerification?
-  resetToken   PasswordResetToken?
+  reservations  Reservation[]
+  session       Session[]
+  is_verified   Boolean   @default(false)
+  verification  EmailVerification?
+  resetToken    PasswordResetToken?
 }
 
 model Note {
-  id String @id @default(cuid())
-  title String
-  content String
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
+  id            String    @id @default(cuid())
+  title         String
+  content       String
+  created_at    DateTime  @default(now())
+  updated_at    DateTime  @updatedAt
 }
 
 model Reservation {
-  id String @id @default(cuid())
-  item String
-  date DateTime
-  userId String
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-  storeId String
-  store Store @relation(fields: [storeId], references: [id], onDelete: Cascade)
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
+  id            String    @id @default(cuid())
+  item          String
+  date          DateTime
+  userId        String
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  storeId       String
+  store         Store      @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  created_at    DateTime   @default(now())
+  updated_at    DateTime   @updatedAt
 }
 
 model Store {
-  id String @id @default(cuid())
-  name String
-  mail String
-  reservations Reservation[]
+  id            String @id @default(cuid())
+  name          String
+  mail          String
+  reservations  Reservation[]
 }

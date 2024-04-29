@@ -13,6 +13,7 @@ import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import { Copyright } from "./Copyright";
 import { useState } from "react";
+import { Alert, AlertColor } from "@mui/material";
 
 export const SignUp = () => {
 	const [canSubmit, setCanSubmit] = useState(true);
@@ -48,7 +49,7 @@ export const SignUp = () => {
 			fetch(url, {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify({name, email, password}),
+				body: JSON.stringify({ name, email, password }),
 				signal: abort.signal
 			}).then(e => {
 				switch (e.status) {
@@ -64,7 +65,7 @@ export const SignUp = () => {
 					return;
 				}
 			}).catch(error => onError(error.toString()));
-			return () => {abort.abort();onError("登録を中断しました");};
+			return () => { abort.abort(); onError("登録を中断しました"); };
 		}
 	};
 
@@ -84,7 +85,7 @@ export const SignUp = () => {
 						<LockOutlinedIcon />
 					</Avatar>
 					<Typography component="h1" variant="h5">
-						Sign up
+						アカウント登録
 					</Typography>
 					<Box
 						component="form"
@@ -107,7 +108,7 @@ export const SignUp = () => {
 								<TextField
 									autoComplete="email"
 									name="email"
-									label="Email Address"
+									label="メールアドレス"
 									type="email"
 									required
 									fullWidth
@@ -117,7 +118,7 @@ export const SignUp = () => {
 								<TextField
 									autoComplete="new-password"
 									name="password"
-									label="Password"
+									label="パスワード"
 									type="password"
 									required
 									fullWidth
@@ -136,12 +137,12 @@ export const SignUp = () => {
 							sx={{ mt: 3, mb: 2 }}
 							disabled={!canSubmit}
 						>
-              Sign Up
+							登録
 						</Button>
 						<Grid container justifyContent="flex-end">
 							<Grid item>
 								<Link href="/login" variant="body2">
-                  Already have an account? Sign in
+									Already have an account? Sign in
 								</Link>
 							</Grid>
 						</Grid>

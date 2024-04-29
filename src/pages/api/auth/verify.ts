@@ -9,9 +9,9 @@ async function POST(
 	const verification = await prisma.emailVerification.findUnique({where:{id: token}});
 	await prisma.user.update({where:{id: verification?.userId}, data:{is_verified: true, verification: {delete: true}}});
 	if (!verification) {
-		res.status(500).json({msg: "リンクが不正です"})
+		res.status(500).json({msg: "リンクが不正です"});
 	} else {
-		res.status(200).json({msg: "認証に成功しました"})
+		res.status(200).json({msg: "認証に成功しました"});
 	}
 }
 

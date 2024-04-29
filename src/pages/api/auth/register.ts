@@ -13,7 +13,7 @@ async function POST(
     
 	await prisma.emailVerification.create({ data: { expired_at: new Date(), user: { create: { name, email, password: passwordHash } } } })
 		.then(async verification => 
-			sendVerificationLink(await prisma.user.findUnique({where:{id:verification.userId}}) as User, verification)
+			sendVerificationLink(await prisma.user.findUnique({where:{id:verification.userId}}) as User, verification.id)
 		).then(e => res.status(200).json({msg: "success!"}))
 		.catch(e => res.status(500).json({msg: e.toString() }));
 }

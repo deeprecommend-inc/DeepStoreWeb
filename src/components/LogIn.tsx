@@ -13,35 +13,52 @@ import Container from "@mui/material/Container";
 import { Copyright } from "./Copyright";
 import { color } from "../constants/const";
 import { useRouter } from "next/router";
-import { signIn } from "next-auth/react";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { Alert, AlertColor } from "@mui/material";
+import { TokenContext } from "@/lib/session";
 
 export const LogIn = () => {
 	const router = useRouter();
 	const [canSubmit, setCanSubmit] = useState(true);
 	const [msg, setMsg] = useState("");
 	const [msgType, setMsgType] = useState<AlertColor>("success");
+	const { setToken } = useContext(TokenContext);
+
 	const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
 		event.preventDefault();
 		setCanSubmit(false);
 		const data = new FormData(event.currentTarget);
 		const email = data.get("email") as string;
 		const password = data.get("password") as string;
-		signIn("credentials", {email, password, redirect: false }).then(result => {
-			if (result?.ok) {
-				setMsg("ログインに成功しました")
-				setMsgType("info");
-			} else {
-				setMsg("ログインに失敗しました")
-				setMsgType("error");
-				setCanSubmit(true);
+
+		const url = `${process.env.API_ROOT}/auth/login`;
+		fetch(url, {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json"
+			},
+			body: JSON.stringify({ email, password })
+		}).then(res => {
+			switch (res.status) {
+				case 200:
+					setMsg("ログインに成功しました");
+					setMsgType("info");
+					res.json().then(data => {
+						const token = data.token;
+						setToken(token);
+						router.push("/");
+					});
+					break;
+				default:
+					setMsg("ログインに失敗しました");
+					setMsgType("error");
+					setCanSubmit(true);
 			}
-		})
+		});
 	};
 
 	return (
-		 <>
+		<>
 			<Container component="main" maxWidth="xs">
 				<CssBaseline />
 				<Box
@@ -56,7 +73,7 @@ export const LogIn = () => {
 						<LockOutlinedIcon />
 					</Avatar>
 					<Typography component="h1" variant="h5">
-            Sign in
+						ログイン
 					</Typography>
 					<Box
 						component="form"
@@ -69,7 +86,7 @@ export const LogIn = () => {
 							required
 							fullWidth
 							id="email"
-							label="Email Address"
+							label="メールアドレス"
 							name="email"
 							autoComplete="email"
 							autoFocus
@@ -79,14 +96,10 @@ export const LogIn = () => {
 							required
 							fullWidth
 							name="password"
-							label="Password"
+							label="パスワード"
 							type="password"
 							id="password"
 							autoComplete="current-password"
-						/>
-						<FormControlLabel
-							control={<Checkbox value="remember" color="primary" />}
-							label="Remember me"
 						/>
 						{msg ?
 							<Alert severity={msgType} variant="outlined">{msg}</Alert>
@@ -103,12 +116,12 @@ export const LogIn = () => {
 						<Grid container>
 							<Grid item xs>
 								<Link href="/forgot" variant="body2">
-                  パスワードを忘れました
+									パスワードを忘れました
 								</Link>
 							</Grid>
 							<Grid item>
 								<Link href="/signup" variant="body2">
-									{"Don't have an account? Sign Up"}
+									アカウントを作成する
 								</Link>
 							</Grid>
 						</Grid>
@@ -116,6 +129,6 @@ export const LogIn = () => {
 				</Box>
 				<Copyright sx={{ mt: 8, mb: 4 }} />
 			</Container>
-			</>
+		</>
 	);
 };
