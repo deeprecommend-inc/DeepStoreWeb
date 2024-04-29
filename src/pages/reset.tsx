@@ -11,13 +11,11 @@ import Box from "@mui/material/Box";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
-import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { Copyright } from "@/components/Copyright";
 import { useState } from "react";
 import { useRouter } from "next/router";
 import { Alert, AlertColor } from "@mui/material";
 import { useSearchParams } from "next/navigation";
-import { defaultTheme } from "@/lib/defaultTheme";
 
 export default function ResetPage() {
 	const token = useSearchParams()?.get("token") || "";
@@ -48,7 +46,7 @@ export default function ResetPage() {
 			}
 		})
 	};
-	return <ThemeProvider theme={defaultTheme}>
+	return <>
 		<Container component="main" maxWidth="xs">
 			<CssBaseline />
 			<Box
@@ -99,5 +97,5 @@ export default function ResetPage() {
 			</Box>
 			<Copyright sx={{ mt: 5 }} />
 		</Container>
-	</ThemeProvider>
+	</>;
 }

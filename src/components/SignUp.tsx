@@ -11,11 +11,8 @@ import Box from "@mui/material/Box";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
-import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { Copyright } from "./Copyright";
 import { useState } from "react";
-import { Alert, AlertColor } from "@mui/material";
-import { defaultTheme } from "@/lib/defaultTheme";
 
 export const SignUp = () => {
 	const [canSubmit, setCanSubmit] = useState(true);
@@ -72,7 +69,7 @@ export const SignUp = () => {
 	};
 
 	return (
-		<ThemeProvider theme={defaultTheme}>
+		<>
 			<Container component="main" maxWidth="xs">
 				<CssBaseline />
 				<Box
@@ -152,6 +149,6 @@ export const SignUp = () => {
 				</Box>
 				<Copyright sx={{ mt: 5 }} />
 			</Container>
-		</ThemeProvider>
+		</>
 	);
 };

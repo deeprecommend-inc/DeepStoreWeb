@@ -10,14 +10,12 @@ import Box from "@mui/material/Box";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
-import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { Copyright } from "./Copyright";
 import { color } from "../constants/const";
 import { useRouter } from "next/router";
 import { signIn } from "next-auth/react";
 import { useState } from "react";
 import { Alert, AlertColor } from "@mui/material";
-import { defaultTheme } from "@/lib/defaultTheme";
 
 export const LogIn = () => {
 	const router = useRouter();
@@ -43,7 +41,7 @@ export const LogIn = () => {
 	};
 
 	return (
-		<ThemeProvider theme={defaultTheme}>
+		 <>
 			<Container component="main" maxWidth="xs">
 				<CssBaseline />
 				<Box
@@ -118,6 +116,6 @@ export const LogIn = () => {
 				</Box>
 				<Copyright sx={{ mt: 8, mb: 4 }} />
 			</Container>
-		</ThemeProvider>
+			</>
 	);
 };

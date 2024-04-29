@@ -1,4 +1,4 @@
-import { styled, createTheme, ThemeProvider } from "@mui/material/styles";
+import { styled } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
 import MuiDrawer from "@mui/material/Drawer";
 import Box from "@mui/material/Box";
@@ -20,7 +20,6 @@ import { Qr } from "./Qr";
 import { useState } from "react";
 import { useSession, signIn, signOut } from "next-auth/react"
 import { Copyright } from "./Copyright";
-import { defaultTheme } from "@/lib/defaultTheme";
 
 const drawerWidth: number = 240;
 
@@ -80,7 +79,7 @@ export const Dashboard = () => {
 	};
 
 	return (
-		<ThemeProvider theme={defaultTheme}>
+		 <>
 			<Box sx={{ display: "flex" }}>
 				<CssBaseline />
 				<AppBar position="absolute" sx={{ boxShadow: "none" }} open={open}>
@@ -181,6 +180,6 @@ export const Dashboard = () => {
 					</Container>
 				</Box>
 			</Box>
-		</ThemeProvider>
+			</>
 	);
 };

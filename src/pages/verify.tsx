@@ -6,15 +6,14 @@ import Box from "@mui/material/Box";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
-import { Alert, AlertColor, Button, ThemeProvider } from "@mui/material";
+import { Alert, , Button, } from "@mui/material";
 import { GetServerSideProps, InferGetServerSidePropsType } from "next";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { defaultTheme } from "@/lib/defaultTheme";
 
 export default function VerifyPage({ success }: InferGetServerSidePropsType<typeof getServerSideProps>) {
 	return (
-		<ThemeProvider theme={defaultTheme}>
+		<>
 			<Container component="main" maxWidth="xs">
 				<CssBaseline />
 				<Box
@@ -29,7 +28,7 @@ export default function VerifyPage({ success }: InferGetServerSidePropsType<type
 						: <Alert variant="outlined" severity="error" action={<Link href="/register"><Button color="inherit" size="small">再登録する</Button></Link>}>認証に失敗しました</Alert>}
 				</Box>
 			</Container>
-		</ThemeProvider>
+		</>
 	);
 }
 
