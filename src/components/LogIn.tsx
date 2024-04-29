@@ -73,7 +73,11 @@ export const LogIn = () => {
 						<LockOutlinedIcon />
 					</Avatar>
 					<Typography component="h1" variant="h5">
+<<<<<<< HEAD
 						ログイン
+=======
+						Sign in
+>>>>>>> ce8caf833b2cf0d6361f42853845017fd7476b7b
 					</Typography>
 					<Box
 						component="form"

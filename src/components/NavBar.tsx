@@ -18,6 +18,10 @@ import { color } from "../constants/const";
 import { ReservationCalendar } from "./Calendar";
 import { Qr } from "./Qr";
 import { useState } from "react";
+<<<<<<< HEAD
+=======
+import { useSession, signIn, signOut } from "next-auth/react"
+>>>>>>> ce8caf833b2cf0d6361f42853845017fd7476b7b
 import { Copyright } from "./Copyright";
 
 const AppBar = styled(MuiAppBar, {
@@ -68,7 +72,11 @@ export default function NavBar({ isLoggedIn, username, logout }: NavBarProps) {
 						<Button
 							variant="text"
 							sx={{ color: "white" }}
+<<<<<<< HEAD
 							onClick={logout}>
+=======
+							onClick={() => signOut()}>
+>>>>>>> ce8caf833b2cf0d6361f42853845017fd7476b7b
 							ログアウト
 						</Button>
 					</>) : (<>
@@ -80,6 +88,7 @@ export default function NavBar({ isLoggedIn, username, logout }: NavBarProps) {
 								ユーザー登録
 							</Button>
 						</Link>
+<<<<<<< HEAD
 						<Link href="/login">
 							<Button
 								variant="text"
@@ -92,4 +101,17 @@ export default function NavBar({ isLoggedIn, username, logout }: NavBarProps) {
 				</div>
 			</Toolbar>
 		</AppBar>);
+=======
+						<Button
+							variant="text"
+							sx={{ color: "white" }}
+							onClick={() => signIn()}
+						>
+							ログイン
+						</Button>
+					</>)}
+				</div>
+			</Toolbar>
+		</AppBar>)
+>>>>>>> ce8caf833b2cf0d6361f42853845017fd7476b7b
 };
