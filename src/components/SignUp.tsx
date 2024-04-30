@@ -3,8 +3,6 @@ import Avatar from "@mui/material/Avatar";
 import Button from "@mui/material/Button";
 import CssBaseline from "@mui/material/CssBaseline";
 import TextField from "@mui/material/TextField";
-import FormControlLabel from "@mui/material/FormControlLabel";
-import Checkbox from "@mui/material/Checkbox";
 import Link from "@mui/material/Link";
 import Grid from "@mui/material/Grid";
 import Box from "@mui/material/Box";
@@ -14,6 +12,7 @@ import Container from "@mui/material/Container";
 import { Copyright } from "./Copyright";
 import { useState } from "react";
 import { Alert, AlertColor } from "@mui/material";
+import { isBlank, isGoodPassword, isValidEmail, isValidTelephoneNum } from "@/lib/validate";
 
 export const SignUp = () => {
 	const [canSubmit, setCanSubmit] = useState(true);
@@ -24,28 +23,26 @@ export const SignUp = () => {
 		setMsg(msg);
 		setCanSubmit(true);
 		setMsgType("error");
-	}
+	};
 	const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-		const blankRegex = /^(?=\s*$)/;
-		const emailRegex = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
-		const telRegex = /^\d{10,11}$/;
-
 		const data = new FormData(event.currentTarget);
 		const name = data.get("name") as string;
 		const email = data.get("email") as string;
 		const password = data.get("password") as string;
 		const tel = data.get("tel") as string;
 		const address = data.get("address") as string;
+
 		event.preventDefault();
-		if (blankRegex.test(name)) {
+
+		if (isBlank(name)) {
 			onError("名前を入力してください");
-		} if (!emailRegex.test(email)) {
+		} if (!isValidEmail(email)) {
 			onError("メールアドレスが不正です");
-		} else if (password.length < 8) {
+		} else if (isGoodPassword(password)) {
 			onError("パスワードが短すぎます。8文字以上入力してください");
-		} else if (!telRegex.test(tel)) {
+		} else if (!isValidTelephoneNum(tel)) {
 			onError("電話番号を数字10または11桁で入力してください");
-		} else if (!address) {
+		} else if (isBlank(address)) {
 			onError("住所を入力してください");
 		} else {
 			setCanSubmit(false);
@@ -93,7 +90,7 @@ export const SignUp = () => {
 						<LockOutlinedIcon />
 					</Avatar>
 					<Typography component="h1" variant="h5">
-						アカウント登録
+						ユーザー登録
 					</Typography>
 					<Box
 						component="form"
@@ -170,7 +167,7 @@ export const SignUp = () => {
 						<Grid container justifyContent="flex-end">
 							<Grid item>
 								<Link href="/login" variant="body2">
-									Already have an account? Sign in
+									ログインする
 								</Link>
 							</Grid>
 						</Grid>

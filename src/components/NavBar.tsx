@@ -50,10 +50,12 @@ export default function NavBar({ isLoggedIn, username, logout }: NavBarProps) {
 								<NotificationsIcon />
 							</Badge>
 						</IconButton>
-						<Button variant="text">予約する</Button>
-						{username ? <Button variant="text" sx={{ color: "white" }}>
-							{username}
-						</Button> : <></>}
+						<Link href="/profile">
+							<Button variant="text">予約する</Button>
+							{username ? <Button variant="text" sx={{ color: "white" }}>
+								{username}
+							</Button> : <></>}
+						</Link>
 						<Button
 							variant="text"
 							sx={{ color: "white" }}

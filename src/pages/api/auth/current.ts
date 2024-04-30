@@ -4,7 +4,11 @@ import prisma from "@/lib/prisma";
 async function POST(req: NextApiRequest, res: NextApiResponse) {
 	// Authrozation: Bearer <token>
 	const token = req.headers.authorization?.substring(7);
-	await prisma.$queryRaw`SELECT "User"."name" FROM "Session" INNER JOIN "User" ON "Session"."userId" = "User"."id" WHERE "Session"."id" = ${token}`
+	if (!token) {
+		res.status(401).json({msg: "no token"});
+		return;
+	}
+	await prisma.$queryRaw`SELECT "User"."name", "User"."email", "User"."address", "User"."tel" FROM "Session" INNER JOIN "User" ON "Session"."userId" = "User"."id" WHERE "Session"."id" = ${token}`
 		.then(e => {
 			if ((e as any[]).length == 1)
 				res.status(200).json((e as any)[0]);

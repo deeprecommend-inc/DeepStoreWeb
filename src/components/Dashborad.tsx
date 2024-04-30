@@ -13,31 +13,10 @@ import { Table, TableCell, TableBody, TableHead, TableRow, Typography } from "@m
 
 export const Dashboard = () => {
 	const { token, setToken } = useContext(TokenContext);
-	const [username, setUsername] = useState("ロード中..");
 	const [reservations, setReservations] = useState<Reservation[]>([]);
 
 	useEffect(() => {
 		if (!token) return;
-		// 現在ログイン中のユーザーの情報を取得
-		fetch("/api/auth/current", {
-			method: "POST",
-			headers: {
-				"Content-Type": "application/json",
-				"Authorization": `Bearer ${token}`
-			}
-		})
-			.then(res => {
-				switch (res?.status) {
-					case 200:
-						if (res != null) {
-							res.json().then(user => setUsername(user.name));
-							break;
-						}
-					default:
-						// 無効なtoken
-						setToken(null);
-				}
-			});
 		// ログイン中のユーザーの予約状況を取得
 		fetch("/api/reservations", {
 			method: "GET",
@@ -54,25 +33,10 @@ export const Dashboard = () => {
 			}))));
 	}, [token]);
 
-	useEffect(() => {
-	}, [token]);
-
-	const logout = () => {
-		const url = "/api/auth/logout";
-		fetch(url, {
-			method: "POST",
-			headers: {
-				"Content-Type": "application/json",
-				"Authorization": `Bearer ${token}`
-			}
-		});
-		setToken(null);
-	};
 
 
 	return (
 		<>
-			<NavBar isLoggedIn={token != null} username={username} logout={logout} />
 			<Box sx={{ display: "flex" }}>
 				<CssBaseline />
 				<Box
