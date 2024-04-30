@@ -18,7 +18,6 @@ import { useState } from "react";
 import { Alert, AlertColor } from "@mui/material";
 
 export default function ForgotPage() {
-	const router = useRouter();
 	const [canSubmit, setCanSubmit] = useState(true);
 	const [msg, setMsg] = useState("");
 	const [msgType, setMsgType] = useState<AlertColor>("success");
@@ -28,23 +27,23 @@ export default function ForgotPage() {
 		const data = new FormData(event.currentTarget);
 		const email = data.get("email") as string;
 
-		const url = `${process.env.API_ROOT}/auth/forgot`
+		const url = `${process.env.API_ROOT}/auth/forgot`;
 		fetch(url, {
 			method: "POST",
 			headers: { "Content-Type": "application/json" },
 			body: JSON.stringify({email})
 		}).then(res => {
 			switch (res.status) {
-			case 200:
-				setMsg("メールを送信しました");
-				setMsgType("info");
-				return;
-			default:
-				setMsg(`${email}のユーザーが見つかりません`)
-				setMsgType("error");
-				setCanSubmit(true);
+				case 200:
+					setMsg("メールを送信しました");
+					setMsgType("info");
+					return;
+				default:
+					setMsg(`${email}のユーザーが見つかりません`);
+					setMsgType("error");
+					setCanSubmit(true);
 			}
-		})
+		});
 	};
 
 	return (
@@ -76,7 +75,7 @@ export default function ForgotPage() {
 							required
 							fullWidth
 							id="email"
-							label="Email Address"
+							label="メールアドレス"
 							name="email"
 							autoComplete="email"
 							autoFocus

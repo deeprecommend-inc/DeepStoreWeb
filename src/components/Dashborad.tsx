@@ -2,12 +2,12 @@ import CssBaseline from "@mui/material/CssBaseline";
 import Box from "@mui/material/Box";
 import Toolbar from "@mui/material/Toolbar";
 import Container from "@mui/material/Container";
-import { ReservationCalendar } from "./Calendar";
 import { Qr } from "./Qr";
 import { useContext, useEffect, useState } from "react";
 import { Copyright } from "./Copyright";
 import NavBar from "./NavBar";
 import { TokenContext } from "@/lib/session";
+import ReservationForm from "./ReservationForm";
 
 export const Dashboard = () => {
 	const { token, setToken } = useContext(TokenContext);
@@ -25,7 +25,7 @@ export const Dashboard = () => {
 				switch (res?.status){
 					case 200:
 						if (res != null) {
-							res.json().then(user => setUsername(user.username));
+							res.json().then(user => setUsername(user.name));
 							break;
 						}
 					default:
@@ -61,9 +61,11 @@ export const Dashboard = () => {
 					}}
 				>
 					<Toolbar />
-					<Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-						<Qr />
-						<ReservationCalendar />
+					<Container maxWidth="lg" sx={{ mt: 4, mb: 4, display: {md: "flex", sm: "block"} }}>
+						<ReservationForm />
+						<Container sx={{display: "flex", justifyContent: "center", alignItems: "center"}}>
+							<Qr />
+						</Container>
 					</Container>
 					<Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
 						<Copyright sx={{ pt: 4 }} />
