@@ -8,21 +8,26 @@ import { Copyright } from "./Copyright";
 import NavBar from "./NavBar";
 import { TokenContext } from "@/lib/session";
 import ReservationForm from "./ReservationForm";
+import { Reservation, Store } from "@prisma/client";
+import { Table, TableCell, TableBody, TableHead, TableRow, Typography } from "@mui/material";
 
 export const Dashboard = () => {
 	const { token, setToken } = useContext(TokenContext);
 	const [username, setUsername] = useState("ロード中..");
+	const [reservations, setReservations] = useState<Reservation[]>([]);
+
 	useEffect(() => {
 		if (!token) return;
-		const url = `/api/auth/current`;
-		fetch(url, {
+		// 現在ログイン中のユーザーの情報を取得
+		fetch("/api/auth/current", {
 			method: "POST",
 			headers: {
 				"Content-Type": "application/json",
 				"Authorization": `Bearer ${token}`
-			}})
+			}
+		})
 			.then(res => {
-				switch (res?.status){
+				switch (res?.status) {
 					case 200:
 						if (res != null) {
 							res.json().then(user => setUsername(user.name));
@@ -33,7 +38,25 @@ export const Dashboard = () => {
 						setToken(null);
 				}
 			});
+		// ログイン中のユーザーの予約状況を取得
+		fetch("/api/reservations", {
+			method: "GET",
+			headers: {
+				"Authorization": `Bearer ${token}`,
+			}
+		})
+			.then(res => res.json())
+			.then((data: Reservation[]) => setReservations(data.map(e => ({
+				...e,
+				date: new Date(e.date),
+				created_at: new Date(e.created_at),
+				updated_at: new Date(e.updated_at),
+			}))));
 	}, [token]);
+
+	useEffect(() => {
+	}, [token]);
+
 	const logout = () => {
 		const url = "/api/auth/logout";
 		fetch(url, {
@@ -61,12 +84,37 @@ export const Dashboard = () => {
 					}}
 				>
 					<Toolbar />
-					<Container maxWidth="lg" sx={{ mt: 4, mb: 4, display: {md: "flex", sm: "block"} }}>
+					<Container maxWidth="lg" sx={{ mt: 4, mb: 4, display: { md: "flex", sm: "block" } }}>
 						<ReservationForm />
-						<Container sx={{display: "flex", justifyContent: "center", alignItems: "center"}}>
+						<Container sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
 							<Qr />
 						</Container>
 					</Container>
+					{token != null && 
+						<Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
+							<Typography component="h1" variant="h5">予約履歴</Typography>
+							<Table aria-label="simple table">
+								<TableHead>
+									<TableRow>
+										<TableCell>日付</TableCell>
+										<TableCell>商品名</TableCell>
+										<TableCell>店舗</TableCell>
+										<TableCell>予約した日</TableCell>
+									</TableRow>
+								</TableHead>
+								<TableBody>
+									{reservations.map(reservation =>
+										<TableRow component="th" scope="row" key={reservation.id}>
+											<TableCell>{reservation.date.toDateString()}</TableCell>
+											<TableCell>{reservation.item}</TableCell>
+											<TableCell>{(reservation as any as { store: Store }).store.name}</TableCell>
+											<TableCell>{reservation.created_at.toDateString()}</TableCell>
+										</TableRow>
+									)}
+								</TableBody>
+							</Table>
+						</Container>
+					}
 					<Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
 						<Copyright sx={{ pt: 4 }} />
 					</Container>

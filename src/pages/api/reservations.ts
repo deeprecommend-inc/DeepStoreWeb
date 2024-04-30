@@ -6,7 +6,19 @@ async function GET(
 	req: NextApiRequest,
 	res: NextApiResponse
 ) {
-	const result = await prisma.reservation.findMany({select: {date: true, item: true}});
+	const token = req.headers.authorization?.substring(7);
+	if (!token) {
+		res.status(401).json({msg: "you need to be logged-in"});
+		return;
+	}
+
+	const userId = (await prisma.session.findUnique({where: {id: token}}))?.userId;
+	if (!userId) {
+		res.status(500).json({msg: "no user found"});
+		return;
+	}
+
+	const result = await prisma.reservation.findMany({where: {userId}, include: {store: {select: {name: true}}}});
 	res.status(200).json(result);
 }
 
@@ -17,7 +29,7 @@ async function POST(
 	const {date, storeId, item} = req.body as {date: string, storeId: string, item: string};
 	const token = req.headers.authorization?.substring(7);
 	if (!token) {
-		res.status(401).json({msg: "you need to logged-in"});
+		res.status(401).json({msg: "you need to be logged-in"});
 		return;
 	}
 	if (new Date(date.toString()).getTime() < Date.now()) {

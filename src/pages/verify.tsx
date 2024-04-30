@@ -1,17 +1,39 @@
-import * as React from "react";
-import Avatar from "@mui/material/Avatar";
+import {useState, useEffect } from "react";
 import CssBaseline from "@mui/material/CssBaseline";
-import Grid from "@mui/material/Grid";
 import Box from "@mui/material/Box";
-import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
-import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
-import { Alert, Button, } from "@mui/material";
+import { Alert, AlertColor, Button, } from "@mui/material";
 import { GetServerSideProps, InferGetServerSidePropsType } from "next";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
 
-export default function VerifyPage({ success }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+export default function VerifyPage() {
+	const [status, setStatus] = useState(0);
+	const [msg, setMsg] = useState("");
+	const [msgType, setMsgType] = useState<AlertColor>("success");
+
+	useEffect(() => {
+		const url = `/api/auth/verify`;
+		const searchParams = new URL(location.href).searchParams;
+		const token = searchParams.get("token");
+		const verificationResult = fetch(url, {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json"
+			},
+			body: JSON.stringify({ token })
+		}).then(res => {
+			setStatus(res.status);
+			if (res.ok) {
+				setMsgType("info");
+			} else {
+				setMsgType("error");
+			}
+			res.json().then(data => {
+				setMsg(data.msg);
+			});
+		});
+	});
+
 	return (
 		<>
 			<Container component="main" maxWidth="xs">
@@ -22,27 +44,14 @@ export default function VerifyPage({ success }: InferGetServerSidePropsType<type
 						display: "flex",
 						flexDirection: "column",
 						alignItems: "center",
+						width: "500px"
 					}}
 				>
-					{success ? <Alert variant="outlined" severity="success" action={<Link href="/login"><Button color="inherit" size="small">ログインする</Button></Link>}>認証に成功しました。</Alert>
-						: <Alert variant="outlined" severity="error" action={<Link href="/register"><Button color="inherit" size="small">再登録する</Button></Link>}>認証に失敗しました</Alert>}
+					{status == 0 ? "ロード中.." :
+						status == 200 ? <Alert variant="outlined" severity={msgType} action={<Link href="/login"><Button color="inherit" size="small">ログインする</Button></Link>}>認証に成功しました。</Alert>
+							: <Alert variant="outlined" severity={msgType} action={<Link href="/register"><Button color="inherit" size="small">再登録する</Button></Link>}>認証に失敗しました: {msg}</Alert>}
 				</Box>
 			</Container>
 		</>
 	);
 }
-
-export const getServerSideProps = (async function (context) {
-	// eslint-disable-next-line react-hooks/rules-of-hooks
-	const token = context.query.token;
-	if (!token) return { props: { success: false } };
-	const url = `${process.env.APP_ROOT}/api/auth/verify`;
-	const verificationResult = await fetch(url, {
-		method: "POST",
-		headers: {
-			"Content-Type": "application/json"
-		},
-		body: JSON.stringify({ token })
-	});
-	return { props: { success: verificationResult.status == 200 } };
-}) satisfies GetServerSideProps<{ success: boolean }>;
