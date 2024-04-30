@@ -16,5 +16,5 @@ export default async function handler(
 	res: NextApiResponse
 ) {
 	if (req.method == "GET") GET(req, res);
-	else res.status(404)
+	else res.status(404);
 }

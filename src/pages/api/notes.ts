@@ -1,19 +1,14 @@
-import type { NextApiRequest, NextApiResponse } from 'next'
-import prisma from "@/lib/prisma"
-import { Note } from '@prisma/client'
-import { getToken } from 'next-auth/jwt';
-import { getServerSession } from 'next-auth';
-import { authOptions } from './auth/[...nextauth]';
+import type { NextApiRequest, NextApiResponse } from 'next';
+import prisma from "@/lib/prisma";
+import { Note } from '@prisma/client';
  
 async function GET(
 	req: NextApiRequest,
 	//   res: NextApiResponse<Note[]>
 	res: NextApiResponse
 ) {
-	const session = await getServerSession(req, res, authOptions);
 	const result = await prisma.note.findMany();
-	const token = getToken({req});
-	res.status(200).json({result, token, session:session });
+	res.status(200).json(result);
 }
 
 async function POST(

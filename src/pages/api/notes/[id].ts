@@ -1,5 +1,5 @@
-import type { NextApiRequest, NextApiResponse } from 'next'
-import prisma from "@/lib/prisma"
+import type { NextApiRequest, NextApiResponse } from 'next';
+import prisma from "@/lib/prisma";
 import { Note } from '@prisma/client';
  
 export async function GET(

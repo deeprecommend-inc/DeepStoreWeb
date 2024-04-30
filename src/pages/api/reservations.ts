@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import prisma from "@/lib/prisma";
-import { Reservation } from '@prisma/client';
+import { isBlank } from '@/lib/validate';
  
 async function GET(
 	req: NextApiRequest,
@@ -41,6 +41,11 @@ async function POST(
 		res.status(500).json({msg: "no user found"});
 		return;
 	}
+
+	if (isBlank(item) || isBlank(date)) {
+		res.status(400).json({msg: "some of properties is missing"});
+	}
+
 	await prisma.reservation.create({data:{date: new Date(date), storeId, userId, item}})
 		.then(result => res.status(200).json(result))
 		.catch(err => res.status(500).json({msg: err.toString()}));
