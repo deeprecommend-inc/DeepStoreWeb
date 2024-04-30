@@ -8,10 +8,10 @@ async function POST(
 	req: NextApiRequest,
 	res: NextApiResponse
 ) {
-	const {name, email, password} = req.body as any as {name: string, email: string, password: string};
+	const {name, email, password, address, tel} = req.body as any as User;
 	const passwordHash = crypto.createHash("sha256").update(password).digest("hex");
     
-	await prisma.emailVerification.create({ data: { expired_at: new Date(), user: { create: { name, email, password: passwordHash } } } })
+	await prisma.emailVerification.create({ data: { expired_at: new Date(), user: { create: { name, email, password: passwordHash, address, tel } } } })
 		.then(async verification => 
 			sendVerificationLink(await prisma.user.findUnique({where:{id:verification.userId}}) as User, verification.id)
 		).then(e => res.status(200).json({msg: "success!"}))

@@ -4,16 +4,18 @@ import { Alert, AlertColor, Avatar, Box, Button, Container, CssBaseline, FormCon
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import {useState, useEffect} from "react";
+import {useState, useEffect, useContext} from "react";
 import { Store } from "@prisma/client";
 import { CreateOutlined } from "@mui/icons-material";
 import { color } from "../constants/const";
+import { TokenContext } from "@/lib/session";
 
 export default function ReservationForm() {
 	const [canSubmit, setCanSubmit] = useState(true);
 	const [msg, setMsg] = useState("");
 	const [msgType, setMsgType] = useState<AlertColor>("success");
 	const [stores, setStores] = useState<Store[]>([]);
+	const {token} = useContext(TokenContext);
 
 	useEffect(() => {
 		fetch("/api/stores").then(res=>res.json()).then(json=>setStores(json));
@@ -21,16 +23,46 @@ export default function ReservationForm() {
 
 	const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
 		event.preventDefault();
+
+		if (!token) {
+			setMsg("ログインしてください");
+			setMsgType("error");
+			return;
+		}
+		
 		const data = new FormData(event.currentTarget);
 		const item = data.get("item");
 		const date = data.get("date");
 		const storeId = data.get("store");
+
+		if (!item || !date || !storeId) {
+			setMsg("予約するにはすべての項目を埋める必要があります");
+			setMsgType("error");
+			return;
+		}
+		
+		if (new Date(date.toString()).getTime() < Date.now()) {
+			setMsg("過去の日付に予約することはできません");
+			setMsgType("error");
+			return;
+		}
+
+		setCanSubmit(false);
 		fetch("/api/reservations", {
 			method: "POST",
-			headers: {"Content-Type": "application/json"},
+			headers: {
+				"Content-Type": "application/json"
+			},
 			body: JSON.stringify({date, item, storeId})})
-			.then(res => alert("予約に成功しました"))
-			.catch(res => alert("予約に失敗しました"));
+			.then(res => {
+				setMsg("予約に成功しました");
+				setMsgType("info");
+			})
+			.catch(res => {
+				setMsg("予約に失敗しました");
+				setMsgType("error");
+				setCanSubmit(true);
+			});
 	};
 
 	return (

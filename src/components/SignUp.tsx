@@ -28,10 +28,14 @@ export const SignUp = () => {
 	const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
 		const blankRegex = /^(?=\s*$)/;
 		const emailRegex = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
+		const telRegex = /^\d{10,11}$/;
+
 		const data = new FormData(event.currentTarget);
 		const name = data.get("name") as string;
 		const email = data.get("email") as string;
 		const password = data.get("password") as string;
+		const tel = data.get("tel") as string;
+		const address = data.get("address") as string;
 		event.preventDefault();
 		if (blankRegex.test(name)) {
 			onError("名前を入力してください");
@@ -39,30 +43,34 @@ export const SignUp = () => {
 			onError("メールアドレスが不正です");
 		} else if (password.length < 8) {
 			onError("パスワードが短すぎます。8文字以上入力してください");
+		} else if (!telRegex.test(tel)) {
+			onError("電話番号を数字10または11桁で入力してください");
+		} else if (!address) {
+			onError("住所を入力してください");
 		} else {
 			setCanSubmit(false);
-			setMsg("送信しています..")
+			setMsg("送信しています..");
 			setMsgType("info");
 
-			const url = `/api/auth/register`
+			const url = `/api/auth/register`;
 			const abort = new AbortController();
 			fetch(url, {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify({ name, email, password }),
+				body: JSON.stringify({ name, email, password, tel, address }),
 				signal: abort.signal
 			}).then(e => {
 				switch (e.status) {
-				case 200:
-					setMsg(`${email}に認証リンクを送信しました`);
-					setMsgType("success");
-					return;
-				case 500: // bad request
-					onError(`すでに${email}で登録されています`);
-					return;
-				default:
-					onError();
-					return;
+					case 200:
+						setMsg(`${email}に認証リンクを送信しました`);
+						setMsgType("success");
+						return;
+					case 500: // bad request
+						onError(`すでに${email}で登録されています`);
+						return;
+					default:
+						onError();
+						return;
 				}
 			}).catch(error => onError(error.toString()));
 			return () => { abort.abort(); onError("登録を中断しました"); };
@@ -99,6 +107,26 @@ export const SignUp = () => {
 									autoComplete="name"
 									name="name"
 									label="名前"
+									required
+									fullWidth
+									autoFocus
+								/>
+							</Grid>
+							<Grid item xs={12}>
+								<TextField
+									autoComplete="tel"
+									name="tel"
+									label="電話番号"
+									required
+									fullWidth
+									autoFocus
+								/>
+							</Grid>
+							<Grid item xs={12}>
+								<TextField
+									autoComplete="address-level1"
+									name="address"
+									label="住所"
 									required
 									fullWidth
 									autoFocus
