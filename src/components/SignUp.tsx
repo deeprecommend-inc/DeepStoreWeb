@@ -38,7 +38,7 @@ export const SignUp = () => {
 			onError("名前を入力してください");
 		} if (!isValidEmail(email)) {
 			onError("メールアドレスが不正です");
-		} else if (isGoodPassword(password)) {
+		} else if (!isGoodPassword(password)) {
 			onError("パスワードが短すぎます。8文字以上入力してください");
 		} else if (!isValidTelephoneNum(tel)) {
 			onError("電話番号を数字10または11桁で入力してください");

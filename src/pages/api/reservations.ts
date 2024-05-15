@@ -1,6 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import prisma from "@/lib/prisma";
 import { isBlank } from '@/lib/validate';
+import { sendReservationNotification } from '@/lib/mailer';
  
 async function GET(
 	req: NextApiRequest,
@@ -34,21 +35,36 @@ async function POST(
 	}
 	if (new Date(date.toString()).getTime() < Date.now()) {
 		res.status(500).json({msg: "invalid date"});
+		return;
 	 }
 
-	const userId = (await prisma.session.findUnique({where: {id: token}}))?.userId;
-	if (!userId) {
+	const session = (await prisma.session.findUnique({where: {id: token}}));
+	if (!session) {
 		res.status(500).json({msg: "no user found"});
+		return;
+	}
+	const user = await prisma.user.findUnique({where: {id: session.userId}});
+	if (!user) {
+		return;
+	}
+
+	const store = await prisma.store.findUnique({where: {id: storeId}});
+	if (!store) {
+		res.status(500).json({msg: "invalid storeid"})
 		return;
 	}
 
 	if (isBlank(item) || isBlank(date)) {
 		res.status(400).json({msg: "some of properties is missing"});
+		return;
 	}
 
-	await prisma.reservation.create({data:{date: new Date(date), storeId, userId, item}})
-		.then(result => res.status(200).json(result))
-		.catch(err => res.status(500).json({msg: err.toString()}));
+	await prisma.reservation.create({data:{date: new Date(date), storeId, userId: session.userId, item}})
+		.then(result => {
+			// 店舗に通知のメールを送る
+			sendReservationNotification(user, result, store);
+            res.status(200).json(result);
+        }).catch(err => res.status(500).json({msg: err.toString()}));
 }
 
 export default async function handler(

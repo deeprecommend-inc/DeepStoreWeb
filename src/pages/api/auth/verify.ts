@@ -12,7 +12,6 @@ async function POST(
 		return;
 	}
 	const result = await prisma.user.update({where:{id: verification.userId}, data:{is_verified: true, verification: {delete: true}}});
-	console.log(result);
 	if (!result) {
 		res.status(500).json({msg: "リンクが不正です"});
 	} else {
