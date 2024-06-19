@@ -5,10 +5,10 @@ frontend:
       commands:
         - rm -rf node_modules
         - rm -rf yarn.lock
-        - yarn install --ignore-engines
+        - npm install --force
     build:
       commands:
-        - yarn run build
+        - npm run build
   artifacts:
     baseDirectory: .next
     files:
